@@ -61,9 +61,9 @@ async def on_ready():
     update_reminders.start()
 
 
-@todo_commands.command(name="newperson", description="Initializes a person into the to-do system")
+@bot.command(name="newperson", description="Initializes a person into the to-do system")
 @catch_errors
-async def todo_newperson(ctx,
+async def newperson(ctx,
                     name: Option(str, "Enter name with which to refer to the user", required = True),
                     beautiful_name: Option(str, "This is the name which will be used in printing the to-do list", required = True),
                     id:   Option(str, "The user id (leave empty to add yourself)", required = False, default="")
@@ -123,9 +123,9 @@ async def todo_list(ctx,
 @reminder_commands.command(name="add", description="Schedules a reminder")
 @catch_errors
 async def reminder_add(ctx,
-                    time: Option(str, "The date and/or time at which you want to set the reminder", required = False, default=None),
+                    time: Option(str, "The date and/or time at which you want to set the reminder (if time of day not specified, current time is used)", required = False, default=None),
                     names: Option(str, "The user(s) who you want to remind of someting (comma-separated)", required = False, default=""),
-                    recurring: Option(str, "How often to recur the reminder (leave empty for non-recurring)", required = False, choices=["daily", "weekly", "monthly", "yearly"]),
+                    recurring: Option(str, "How often to recur the reminder (leave empty for non-recurring)", required = False, choices=todos.Reminder.recurring_options),
                     content: Option(str, "The content of the reminder (if empty, this is a copy of the task)", required = False, default=None),
                     task_id: Option(int, name="task", description="The task that is linked to the reminder", required = False, default=None),
                     ):
