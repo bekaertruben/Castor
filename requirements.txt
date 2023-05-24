@@ -1,0 +1,10 @@
+py-cord
+tinydb
+python-dotenv
+pytz
+
+# py-cord speedups
+aiodns
+brotlipy
+cchardet
+orjson

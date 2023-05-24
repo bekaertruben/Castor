@@ -8,7 +8,9 @@ from todos import ToDoException
 
 from functools import wraps
 import os
+from dotenv import load_dotenv
 
+load_dotenv(override=True)
 TOKEN = os.environ['TOKEN']
 
 todo_commands = discord.SlashCommandGroup("todo", "Commands to manage to-do lists")

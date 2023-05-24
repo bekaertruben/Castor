@@ -74,6 +74,7 @@ class YAMLStorage(Storage):
 # db = TinyDB('db.json', sort_keys=True, indent=4, separators=(',', ': '))
 db = TinyDB('db.yml', storage=YAMLStorage)
 
+
 class Person:
     table = db.table('people')
 
