@@ -79,13 +79,13 @@ class Person:
     table = db.table('people')
 
     name: str # the unique identifier with which to refer to the person
-    beautiful_name: str # the nicely formatted string used in to-do list printing
+    pretty_name: str # the nicely formatted string used in to-do list printing
     id: str # discord's numerical id for the user's account (this should be a string!)
 
     def __init__(self, _person):
         self.doc_id = _person.doc_id
         self.name = _person['name']
-        self.beautiful_name = _person['beautiful_name']
+        self.pretty_name = _person['pretty_name']
         self.id = _person['id']
 
     @classmethod
@@ -106,13 +106,13 @@ class Person:
             return None
     
     @classmethod
-    def new_person(cls, name:str, beautiful_name:str, id:str) -> Person:
+    def new_person(cls, name:str, pretty_name:str, id:str) -> Person:
         name = format_name(name)
         if cls.from_name(name):
             raise ToDoException(f"A person with name `{name}` already exists.")
         if cls.from_id(id):
             raise ToDoException(f"A person with id `{id}` already exists.")
-        doc_id = cls.table.insert({'name': name, 'beautiful_name': beautiful_name, 'id': id})
+        doc_id = cls.table.insert({'name': name, 'pretty_name': pretty_name, 'id': id})
         return cls(cls.table.get(doc_id=doc_id))
     
     @classmethod

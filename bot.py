@@ -26,6 +26,9 @@ BROWN = 0x6a4441
 RED   = 0xd34322
 
 
+EPHEMERAL_MESSAGES=False # Sets whether most bot responses are emphemeral. Todo list and Reminder list will not be affected, and remain public
+
+
 def catch_errors(command):
     """ This ensures errors are caught and reported to the user """
     @wraps(command)
@@ -34,10 +37,10 @@ def catch_errors(command):
             await command(ctx, *args, **kwargs)
         except ToDoException as e:
             embed = discord.Embed(title="Error", description=f"❌ {e.msg}", color=RED)
-            await ctx.respond(embed=embed)
+            await ctx.respond(embed=embed, ephemeral=True)
         except Exception as e:
             embed = discord.Embed(title="Error", description=f"❌ Command failed for unknown reason.", color=RED)
-            await ctx.respond(embed=embed)
+            await ctx.respond(embed=embed, ephemeral=True)
             raise e
     return wrapper
 
@@ -67,18 +70,18 @@ async def on_ready():
 @catch_errors
 async def newperson(ctx,
                     name: Option(str, "Enter name with which to refer to the user", required = True),
-                    beautiful_name: Option(str, "This is the name which will be used in printing the to-do list", required = True),
+                    pretty_name: Option(str, "This is the name which will be used in printing the to-do list", required = True),
                     id:   Option(str, "The user id (leave empty to add yourself)", required = False, default="")
                     ):
     if not id:
         id = str(ctx.author.id)
         if existing_person:=todos.Person.from_id(id):
-            raise ToDoException(f"Your id (`{id}`) is already known under the name {existing_person.beautiful_name} (`{existing_person.name}`),\
+            raise ToDoException(f"Your id (`{id}`) is already known under the name {existing_person.pretty_name} (`{existing_person.name}`),\
                                     please provide a specific id for another person.")
-    person = todos.Person.new_person(name, beautiful_name, id)
-    embed = discord.Embed(title="Created user", description=f"✅ Successfully initialized user {person.beautiful_name} (<@{person.id}>)\
+    person = todos.Person.new_person(name, pretty_name, id)
+    embed = discord.Embed(title="Created user", description=f"✅ Successfully initialized user {person.pretty_name} (<@{person.id}>)\
                             \nto refer to this user in commands, use `{person.name}`", color=GREEN)
-    await ctx.respond(embed=embed)
+    await ctx.respond(embed=embed, ephemeral=EPHEMERAL_MESSAGES)
 
 
 @todo_commands.command(name="add", description="Adds a task to someone's to-do list")
@@ -90,9 +93,9 @@ async def todo_add(ctx,
                     ):
     person = parse_person(ctx, name)
     task = person.add_task(task, deadline)
-    embed = discord.Embed(title="Added task", description=f"✅ Successfully added the following task for **{person.beautiful_name}**:\
-                            \n---\n{task}", color=GREEN)
-    await ctx.respond(embed=embed)
+    embed = discord.Embed(title="Added task", description=f"✅ Successfully added the following task for **{person.pretty_name}**:\
+                            \n>>> {task}", color=GREEN)
+    await ctx.respond(embed=embed, ephemeral=EPHEMERAL_MESSAGES)
 
 
 @todo_commands.command(name="remove", description="Marks a task as completed")
@@ -104,9 +107,9 @@ async def todo_remove(ctx,
     if not task:
         raise ToDoException(f"There is no task with id `{task_id}`.")
     person = todos.Person.from_name(task.name)
-    embed = discord.Embed(title="Removed task", description=f"✅ Marked the following task as completed (owned by **{person.beautiful_name}**):\
-                            \n---\n{task}", color=GREEN)
-    await ctx.respond(embed=embed)
+    embed = discord.Embed(title="Removed task", description=f"✅ Marked the following task as completed (owned by **{person.pretty_name}**):\
+                            \n>>> {task}", color=GREEN)
+    await ctx.respond(embed=embed, ephemeral=EPHEMERAL_MESSAGES)
         
 
 @todo_commands.command(name="list", description="Lists a person's to-do list")
@@ -118,14 +121,14 @@ async def todo_list(ctx,
     todo_list = person.todo_list()
     if not todo_list:
         todo_list = "Wow, such empty..."
-    embed = discord.Embed(title=f"{person.beautiful_name}'s to-do's", description=todo_list, color=GREEN)
+    embed = discord.Embed(title=f"{person.pretty_name}'s to-do's", description=f">>> {todo_list}", color=GREEN)
     await ctx.respond(embed=embed)
 
 
 @reminder_commands.command(name="add", description="Schedules a reminder")
 @catch_errors
 async def reminder_add(ctx,
-                    time: Option(str, "The date and/or time at which you want to set the reminder (if time of day not specified, current time is used)", required = False, default=None),
+                    time: Option(str, "The date and/or time at which you want to set the reminder", required = False, default=None),
                     names: Option(str, "The user(s) who you want to remind of someting (comma-separated)", required = False, default=""),
                     recurring: Option(str, "How often to recur the reminder (leave empty for non-recurring)", required = False, choices=todos.Reminder.recurring_options),
                     content: Option(str, "The content of the reminder (if empty, this is a copy of the task)", required = False, default=None),
@@ -136,11 +139,11 @@ async def reminder_add(ctx,
         person = parse_person(ctx, None)
         names = [person.name]
     reminder = todos.Reminder.new_reminder(time, names, recurring, content, task_id)
-    people = [todos.Person.from_name(name).beautiful_name for name in reminder.names]
+    people = [todos.Person.from_name(name).pretty_name for name in reminder.names]
     people_str = ", ".join(people)
     embed = discord.Embed(title="Added task", description=f"✅ Successfully created the following reminder for **{people_str}** :\
-                            \n---\n{reminder}", color=GREEN)
-    await ctx.respond(embed=embed)
+                            \n>>> {reminder}", color=GREEN)
+    await ctx.respond(embed=embed, ephemeral=EPHEMERAL_MESSAGES)
 
 
 @reminder_commands.command(name="remove", description="Deletes a remider")
@@ -151,11 +154,11 @@ async def reminder_remove(ctx,
     reminder = todos.Reminder.remove_reminder(reminder_id)
     if not reminder:
         raise ToDoException(f"There is no reminder with id `{reminder_id}`.")
-    people = [todos.Person.from_name(name).beautiful_name for name in reminder.names]
+    people = [todos.Person.from_name(name).pretty_name for name in reminder.names]
     people_str = ", ".join(people)
     embed = discord.Embed(title="Removed task", description=f"✅ Removed the following reminder for **{people_str}**:\
-                            \n---\n{reminder}", color=GREEN)
-    await ctx.respond(embed=embed)
+                            \n>>> {reminder}", color=GREEN)
+    await ctx.respond(embed=embed, ephemeral=EPHEMERAL_MESSAGES)
 
 
 @reminder_commands.command(name="list", description="Lists a person's to-do list")
@@ -167,7 +170,7 @@ async def reminder_list(ctx,
     reminder_list = person.reminder_list()
     if not reminder_list:
         reminder_list = "Wow, such empty..."
-    embed = discord.Embed(title=f"{person.beautiful_name}'s reminders (some may be shared with other people)", description=reminder_list, color=GREEN)
+    embed = discord.Embed(title=f"{person.pretty_name}'s reminders (some may be shared with other people)", description=f">>> {reminder_list}", color=GREEN)
     await ctx.respond(embed=embed)
 
 
