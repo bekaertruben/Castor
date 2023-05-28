@@ -1,10 +1,12 @@
 py-cord
 tinydb
+pyyaml
 python-dotenv
+python-dateutil
 pytz
 
 # py-cord speedups
 aiodns
 brotlipy
-cchardet
+# cchardet
 orjson
