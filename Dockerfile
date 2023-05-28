@@ -1,7 +1,6 @@
-FROM python:3.11-slim
+FROM python:3.11
 
-ENV BUILD_DEPS gcc g++ 
-RUN apt-get update && apt-get install -y $BUILD_DEPS --no-install-recommends && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt

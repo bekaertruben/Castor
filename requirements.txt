@@ -8,5 +8,5 @@ pytz
 # py-cord speedups
 aiodns
 brotlipy
-cchardet
+# cchardet
 orjson
