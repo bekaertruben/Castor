@@ -1,7 +1,6 @@
 py-cord
 tinydb
 pyyaml
-python-dotenv
 python-dateutil
 pytz
 

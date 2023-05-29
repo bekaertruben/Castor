@@ -71,9 +71,9 @@ class YAMLStorage(Storage):
     def close(self):
         pass
 
-# /data is the persistent volume provided by docker/podman
+# /app/data is the persistent volume provided by docker/podman
 # if you want to run this outside of a container, just use "db.json"
-db = TinyDB("/data/db.yml", storage=YAMLStorage)
+db = TinyDB("/app/data/db.yml", storage=YAMLStorage)
 
 
 class Person:

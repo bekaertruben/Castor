@@ -8,10 +8,8 @@ from todos import ToDoException
 
 from functools import wraps
 import os
-from dotenv import load_dotenv
 
-load_dotenv(override=True)
-TOKEN = os.environ['TOKEN']
+TOKEN = os.environ['DISCORD_TOKEN']
 
 todo_commands = discord.SlashCommandGroup("todo", "Commands to manage to-do lists")
 reminder_commands = discord.SlashCommandGroup("reminder", "Commands to manage reminders")
