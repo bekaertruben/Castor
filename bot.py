@@ -24,7 +24,9 @@ BROWN = 0x6a4441
 RED   = 0xd34322
 
 
-EPHEMERAL_MESSAGES=False # Sets whether most bot responses are emphemeral. Todo list and Reminder list will not be affected, and remain public
+EPHEMERAL_MESSAGES=False # Sets whether most bot responses are emphemeral.
+# Todo list and Reminder list will are not affected by this, and remain visible to everyone
+# Error messages are also not affected, they remain ephemeral
 
 
 def catch_errors(command):
